@@ -5,13 +5,15 @@ import customerservice.pojo.Customer;
 import java.util.List;
 
 public interface CustomerServiceInterface {
-    Customer getCustomer(int customerNumber);
+    Customer getCustomer(Integer customerNumber);
 
     List<Customer> getAllCustomer();
 
-    void updateCustomer(Customer c);
+    Customer updateCustomer(Customer c);
 
-    void deleteCustomer(Customer c);
+    void deleteCustomer(Integer c);
 
-    void insertCustomer(Customer cystomer);
+    Customer insertCustomer(Customer cystomer);
+
+    boolean customerExists(Integer customerId);
 }

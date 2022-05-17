@@ -5,7 +5,11 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/
+#      defaultZone: http://172.19.141.42:8761/eureka/
 spring:
   data:
     mongodb:
       auto-index-creation: true
+      host: localhost
+      port: 27017
+      database: CustomerDB
