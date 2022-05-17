@@ -15,7 +15,7 @@ public class CustomerService implements CustomerServiceInterface {
     private CustomerRepository customerRepository;
 
     @Override
-    public Customer getCustomer(int customerNumber) {
+    public Customer getCustomer(Integer customerNumber) {
         Optional<Customer> searchResult = customerRepository.findById(customerNumber);
         if (searchResult.isPresent())
             return searchResult.get();
@@ -31,17 +31,30 @@ public class CustomerService implements CustomerServiceInterface {
     }
 
     @Override
-    public void updateCustomer(Customer c) {
-        customerRepository.insert(c);
+    public Customer updateCustomer(Customer c) {
+        if (customerExists(c.getCustomerId())) {
+            return customerRepository.save(c);
+        } else {
+            return null;
+        }
     }
 
     @Override
-    public void deleteCustomer(Customer c) {
-        customerRepository.delete(c);
+    public void deleteCustomer(Integer customerId) {
+            customerRepository.deleteById(customerId);
     }
 
     @Override
-    public void insertCustomer(Customer customer) {
-        customerRepository.insert(customer);
+    public Customer insertCustomer(Customer customer) {
+        if (customerExists(customer.getCustomerId())) {
+            return null;
+        } else {
+            return customerRepository.save(customer);
+        }
+    }
+
+    @Override
+    public boolean customerExists(Integer customerId) {
+        return customerRepository.existsById(customerId);
     }
 }

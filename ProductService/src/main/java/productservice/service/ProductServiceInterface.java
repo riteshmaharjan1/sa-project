@@ -7,13 +7,15 @@ import java.util.List;
 public interface ProductServiceInterface {
     Product getProduct(int productNumber);
 
-    void insertProduct(Product p);
+    Product insertProduct(Product product);
 
     List<Product> getAllProduct();
 
-    void deleteProduct(Product p);
+    void deleteProduct(Integer productNumber);
 
-    void updateProduct(Product product);
+    Product updateProduct(Product product);
 
     boolean hasProductWithQuantity(Product p, int quantity);
+
+    boolean productExists(Integer customerId);
 }

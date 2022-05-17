@@ -1,12 +1,16 @@
 package customerservice.pojo;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document
+import javax.annotation.processing.Generated;
+
+@Document(collection = "customer")
 public class Customer {
+
     @Id
-    int customerId;
+    Integer customerId;
 
     private String firstName, lastName, phone, email;
     private Address address;
@@ -19,7 +23,7 @@ public class Customer {
         this.address = address;
     }
 
-    public Customer(int customerId, String firstName, String lastName, String phone, String email, Address address) {
+    public Customer(Integer customerId, String firstName, String lastName, String phone, String email, Address address) {
         this.customerId = customerId;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -28,11 +32,14 @@ public class Customer {
         this.address = address;
     }
 
-    public int getCustomerId() {
+    public Customer() {
+    }
+
+    public Integer getCustomerId() {
         return customerId;
     }
 
-    public void setCustomerId(int customerId) {
+    public void setCustomerId(Integer customerId) {
         this.customerId = customerId;
     }
 

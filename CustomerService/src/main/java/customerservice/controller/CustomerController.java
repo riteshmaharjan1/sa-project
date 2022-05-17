@@ -13,33 +13,56 @@ public class CustomerController {
     CustomerService customerService;
 
     @GetMapping("/getCustomer/{customerNumber}")
-    public ResponseEntity<?> getCustomer(@PathVariable("customerNumber") int customerNumber) {
+    public ResponseEntity<?> getCustomer(@PathVariable("customerNumber") Integer customerNumber) {
         Customer customer = customerService.getCustomer(customerNumber);
-        return new ResponseEntity<>(customer
-                , HttpStatus.OK);
+        if (customer != null) {
+            return new ResponseEntity<>(customer, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(new CustomMessage("Customer not found.")
+                    , HttpStatus.NOT_FOUND);
+        }
     }
 
     @PostMapping("/addCustomer")
     public ResponseEntity<?> addCustomer(@RequestBody Customer customer) {
-        customerService.insertCustomer(customer);
-        return new ResponseEntity<>("Success", HttpStatus.OK);
+        Customer addCus = customerService.insertCustomer(customer);
+        if (addCus != null) {
+            return new ResponseEntity<>("Success", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(new CustomMessage("Customer already exists. Unable to add customer.")
+                    , HttpStatus.NOT_FOUND);
+        }
     }
 
-    @PostMapping("/editCustomer")
+    @PutMapping("/editCustomer")
     public ResponseEntity<?> editCustomer(@RequestBody Customer customer) {
-        customerService.updateCustomer(customer);
-        return new ResponseEntity<>("Success", HttpStatus.OK);
+        Customer udpate = customerService.updateCustomer(customer);
+        if (udpate != null) {
+            return new ResponseEntity<>("Successfully updated.", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(new CustomMessage("Customer doesn't exists.")
+                    , HttpStatus.NOT_FOUND);
+        }
     }
 
-    @PostMapping("/deleteCustomer")
-    public ResponseEntity<?> deleteCustomer(@RequestBody Customer customer) {
-        customerService.deleteCustomer(customer);
-        return new ResponseEntity<>("Success", HttpStatus.OK);
+    @DeleteMapping("/deleteCustomer/{customerId}")
+    public ResponseEntity<?> deleteCustomer(@PathVariable Integer customerId) {
+        if (customerService.customerExists(customerId)) {
+            customerService.deleteCustomer(customerId);
+            return new ResponseEntity<>("Successfully Deleted.", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(new CustomMessage("Customer doesn't exists.")
+                    , HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping("/getAllCustomers")
     public ResponseEntity<?> getAllCustomers() {
-        return new ResponseEntity<>(customerService.getAllCustomer(), HttpStatus.OK);
+        if (customerService.getAllCustomer().size() == 0) {
+            return new ResponseEntity<>(new CustomMessage("Customer not available.")
+                    , HttpStatus.NOT_FOUND);
+        } else {
+            return new ResponseEntity<>(customerService.getAllCustomer(), HttpStatus.OK);
+        }
     }
-
 }
