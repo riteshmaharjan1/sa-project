@@ -24,13 +24,13 @@ public class ProductController {
         return new ResponseEntity<>("Success", HttpStatus.OK);
     }
 
-    @PostMapping("/editProduct")
+    @PutMapping("/editProduct")
     public ResponseEntity<?> editProduct(@RequestBody Product product) {
         productService.updateProduct(product);
         return new ResponseEntity<>("Success", HttpStatus.OK);
     }
 
-    @PostMapping("/deleteProduct")
+    @DeleteMapping("/deleteProduct")
     public ResponseEntity<?> deleteProduct(@RequestBody Product product) {
         productService.deleteProduct(product);
         return new ResponseEntity<>("Success", HttpStatus.OK);

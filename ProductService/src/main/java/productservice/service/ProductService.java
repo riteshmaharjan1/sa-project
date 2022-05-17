@@ -41,7 +41,7 @@ public class ProductService implements ProductServiceInterface {
 
     @Override
     public void updateProduct(Product product) {
-        productRepository.insert(product);
+        productRepository.save(product);
     }
 
     @Override
