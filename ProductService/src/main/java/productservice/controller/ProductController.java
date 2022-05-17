@@ -14,30 +14,54 @@ public class ProductController {
 
     @GetMapping("/getProduct/{productNumber}")
     public ResponseEntity<?> getProduct(@PathVariable int productNumber) {
-        Product example = productService.getProduct(productNumber);
-        return new ResponseEntity<>(example, HttpStatus.OK);
+        Product product = productService.getProduct(productNumber);
+        if (product != null)
+            return new ResponseEntity<>(product, HttpStatus.OK);
+        else
+            return new ResponseEntity<>(new CustomMessage("Product not found.")
+                    , HttpStatus.NOT_FOUND);
     }
 
     @PostMapping("/addProduct")
     public ResponseEntity<?> addProduct(@RequestBody Product product) {
-        productService.insertProduct(product);
-        return new ResponseEntity<>("Success", HttpStatus.OK);
+        Product addPro = productService.insertProduct(product);
+        if (addPro != null) {
+            return new ResponseEntity<>("Success", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(new CustomMessage("Product already exists. Unable to add product.")
+                    , HttpStatus.NOT_FOUND);
+        }
     }
 
     @PutMapping("/editProduct")
     public ResponseEntity<?> editProduct(@RequestBody Product product) {
-        productService.updateProduct(product);
-        return new ResponseEntity<>("Success", HttpStatus.OK);
+        Product updatedPro = productService.updateProduct(product);
+        if (updatedPro != null) {
+            return new ResponseEntity<>("Success", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(new CustomMessage("Product doesn't exists.")
+                    , HttpStatus.NOT_FOUND);
+        }
     }
 
-    @DeleteMapping("/deleteProduct")
-    public ResponseEntity<?> deleteProduct(@RequestBody Product product) {
-        productService.deleteProduct(product);
-        return new ResponseEntity<>("Success", HttpStatus.OK);
+    @DeleteMapping("/deleteProduct/{productNumber}")
+    public ResponseEntity<?> deleteProduct(@PathVariable Integer productNumber) {
+        if (productService.productExists(productNumber)) {
+            productService.deleteProduct(productNumber);
+            return new ResponseEntity<>("Successfully Deleted.", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(new CustomMessage("Product doesn't exists.")
+                    , HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping("/getAllProducts")
     public ResponseEntity<?> getAllProducts() {
-        return new ResponseEntity<>(productService.getAllProduct(), HttpStatus.OK);
+        if (productService.getAllProduct().size() == 0) {
+            return new ResponseEntity<>(new CustomMessage("Product not available.")
+                    , HttpStatus.NOT_FOUND);
+        } else {
+            return new ResponseEntity<>(productService.getAllProduct(), HttpStatus.OK);
+        }
     }
 }

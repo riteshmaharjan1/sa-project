@@ -25,8 +25,12 @@ public class ProductService implements ProductServiceInterface {
     }
 
     @Override
-    public void insertProduct(Product p) {
-        productRepository.insert(p);
+    public Product insertProduct(Product product) {
+        if (productExists(product.getProductNumber())) {
+            return null;
+        } else {
+            return productRepository.save(product);
+        }
     }
 
     @Override
@@ -35,13 +39,17 @@ public class ProductService implements ProductServiceInterface {
     }
 
     @Override
-    public void deleteProduct(Product p) {
-        productRepository.delete(p);
+    public void deleteProduct(Integer productNumber) {
+        productRepository.deleteById(productNumber);
     }
 
     @Override
-    public void updateProduct(Product product) {
-        productRepository.save(product);
+    public Product updateProduct(Product product) {
+        if (productExists(product.getProductNumber())) {
+            return productRepository.save(product);
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -53,5 +61,10 @@ public class ProductService implements ProductServiceInterface {
                 hasEnough = true;
         }
         return hasEnough;
+    }
+
+    @Override
+    public boolean productExists(Integer productNumber) {
+        return productRepository.existsById(productNumber);
     }
 }
