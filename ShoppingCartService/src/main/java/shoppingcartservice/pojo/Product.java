@@ -9,22 +9,34 @@ public class Product {
     private double price;
     private String description;
 
+    private int customerId;
+
     public Product() {
     }
 
-    public Product(int productNumber, String productName, int stockNumber, double price, String description) {
+    public Product(int productNumber, String productName, int stockNumber, double price, String description, int customerId) {
         this.productNumber = productNumber;
         this.productName = productName;
         this.quantity = stockNumber;
         this.price = price;
         this.description = description;
+        this.customerId = customerId;
     }
 
-    public Product(String productName, int stockNumber, double price, String description) {
+    public Product(String productName, int stockNumber, double price, String description, int customerId) {
         this.productName = productName;
         this.quantity = stockNumber;
         this.price = price;
         this.description = description;
+        this.customerId = customerId;
+    }
+
+    public int getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(int customerId) {
+        this.customerId = customerId;
     }
 
     public int getProductNumber() {
@@ -65,5 +77,12 @@ public class Product {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (!(obj instanceof Product product)) return false;
+        return product.getProductNumber() == this.getProductNumber();
     }
 }

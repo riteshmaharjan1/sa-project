@@ -6,6 +6,7 @@ import shoppingcartservice.pojo.Product;
 import shoppingcartservice.pojo.ShoppingCart;
 import shoppingcartservice.repository.ShoppingCartRepository;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 @Service
@@ -14,6 +15,16 @@ public class ShoppingCartService implements ShoppingCartServiceInterface {
     @Autowired
     private ShoppingCartRepository repository;
 
+
+    @Override
+    public ShoppingCart createShoppingCart(int customerId) {
+        ShoppingCart shoppingCart = new ShoppingCart(new ArrayList<>());
+        shoppingCart.setShoppingCartNumber(customerId);
+        setShoppingCart(shoppingCart);
+        return shoppingCart;
+    }
+
+    @Override
     public void setShoppingCart(ShoppingCart shoppingCart) {
         repository.insert(shoppingCart);
     }
@@ -27,7 +38,12 @@ public class ShoppingCartService implements ShoppingCartServiceInterface {
     @Override
     public void deleteProduct(int customerId, Product product) {
         Optional<ShoppingCart> shoppingCart = repository.findById(customerId);
-        shoppingCart.ifPresent(cart -> cart.getProducts().remove(product));
+        shoppingCart.ifPresent(cart -> {
+            cart.getProducts().remove(product);
+
+            repository.deleteById(customerId);
+            repository.insert(shoppingCart.get());
+        });
     }
 
     @Override
@@ -39,15 +55,25 @@ public class ShoppingCartService implements ShoppingCartServiceInterface {
             } else {
                 cart.addProduct(product);
             }
+
+            repository.deleteById(customerId);
+            repository.insert(shoppingCart.get());
         });
-        repository.deleteById(customerId);
-        repository.insert(shoppingCart.get());
     }
 
     @Override
     public void updateQuantity(Product product, int quantity, int customerId) {
         Optional<ShoppingCart> shoppingCart = repository.findById(customerId);
-        shoppingCart.ifPresent(cart -> cart.getProducts().get(cart.getProducts().lastIndexOf(product)).setQuantity(quantity));
+        shoppingCart.ifPresent(cart -> {
+            int lastIndex = cart.getProducts().indexOf(product);
+            if (lastIndex == -1) {
+                cart.addProduct(product);
+            } else
+                cart.getProducts().get(lastIndex).setQuantity(quantity);
+
+            repository.deleteById(customerId);
+            repository.insert(cart);
+        });
     }
 
     @Override
