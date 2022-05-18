@@ -2,7 +2,7 @@ package customerservice.controller;
 
 import customerservice.pojo.Customer;
 import customerservice.service.CustomerService;
-import customerservice.service.Sender;
+import customerservice.integration.Sender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,11 +31,11 @@ public class CustomerController {
     public ResponseEntity<?> addCustomer(@RequestBody Customer customer) {
         Customer addCus = customerService.insertCustomer(customer);
         if (addCus != null) {
-            sender.sendCustomer("CUSTOMER_ADDED", customer);
+            sender.sendData("CUSTOMER_ADDED", customer);
             return new ResponseEntity<>("Success", HttpStatus.OK);
         } else {
             return new ResponseEntity<>(new CustomMessage("Customer already exists. Unable to add customer.")
-                    , HttpStatus.NOT_FOUND);
+                    , HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -43,7 +43,7 @@ public class CustomerController {
     public ResponseEntity<?> editCustomer(@RequestBody Customer customer) {
         Customer udpate = customerService.updateCustomer(customer);
         if (udpate != null) {
-            sender.sendCustomer("CUSTOMER_UPDATED", customer);
+            sender.sendData("CUSTOMER_UPDATED", customer);
             return new ResponseEntity<>("Successfully updated.", HttpStatus.OK);
         } else {
             return new ResponseEntity<>(new CustomMessage("Customer doesn't exists.")
@@ -55,7 +55,7 @@ public class CustomerController {
     public ResponseEntity<?> deleteCustomer(@PathVariable Integer customerId) {
         if (customerService.customerExists(customerId)) {
             customerService.deleteCustomer(customerId);
-            sender.sendDeleteID("CUSTOMER_DELETED", customerId);
+            sender.sendData("CUSTOMER_DELETED", customerId);
             return new ResponseEntity<>("Successfully Deleted.", HttpStatus.OK);
         } else {
             return new ResponseEntity<>(new CustomMessage("Customer doesn't exists.")
@@ -66,7 +66,7 @@ public class CustomerController {
     @GetMapping("/getAllCustomers")
     public ResponseEntity<?> getAllCustomers() {
         if (customerService.getAllCustomer().size() == 0) {
-            return new ResponseEntity<>(new CustomMessage("Customer not available.")
+            return new ResponseEntity<>(new CustomMessage("Customers not available.")
                     , HttpStatus.NOT_FOUND);
         } else {
             return new ResponseEntity<>(customerService.getAllCustomer(), HttpStatus.OK);
