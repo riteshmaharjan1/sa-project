@@ -20,14 +20,16 @@ public class ShoppingCartController {
         if (shoppingCart != null)
             return new ResponseEntity<>(shoppingCart, HttpStatus.OK);
         else
-            return new ResponseEntity<>("No Cart found!!", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new CustomMessage("No Cart found!!")
+                    , HttpStatus.BAD_REQUEST);
     }
 
     @GetMapping("/createShoppingCart/{customerId}")
     public ResponseEntity<?> createShoppingCart(@PathVariable int customerId) {
         ShoppingCart shoppingCart = shoppingCartService.getShoppingCart(customerId);
         if (shoppingCart != null)
-            return new ResponseEntity<>("Shopping Cart Already Exist for this user", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new CustomMessage("Shopping Cart Already Exist for this user.")
+                    , HttpStatus.BAD_REQUEST);
         ShoppingCart s = shoppingCartService.createShoppingCart(customerId);
         return new ResponseEntity<>(s, HttpStatus.OK);
     }
@@ -41,12 +43,14 @@ public class ShoppingCartController {
     @DeleteMapping("/removeProduct")
     public ResponseEntity<?> deleteProduct(@RequestBody Product product) {
         shoppingCartService.deleteProduct(product.getCustomerId(), product);
-        return new ResponseEntity<>("Product Removed From Shopping Cart", HttpStatus.OK);
+        return new ResponseEntity<>(new CustomMessage("Product Removed From Shopping Cart")
+                , HttpStatus.OK);
     }
 
     @PutMapping("/updateQuantity")
     public ResponseEntity<?> updateQuantity(@RequestBody Product product) {
         shoppingCartService.updateQuantity(product, product.getQuantity(), product.getCustomerId());
-        return new ResponseEntity<>("Quantity Updated", HttpStatus.OK);
+        return new ResponseEntity<>(new CustomMessage("Quantity Updated.")
+                , HttpStatus.OK);
     }
 }

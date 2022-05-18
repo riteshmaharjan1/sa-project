@@ -1,4 +1,4 @@
-package customerservice.controller;
+package shoppingcartservice.controller;
 
 /**
  * Added BY rajendramaharjan
