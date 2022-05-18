@@ -17,15 +17,14 @@ public class ProductController {
     private SequenceGeneratorService sequenceGenerator;
 
     @Autowired
-    public ProductController(SequenceGeneratorService sequenceGenerator)
-    {
-        this.sequenceGenerator=sequenceGenerator;
+    public ProductController(SequenceGeneratorService sequenceGenerator) {
+        this.sequenceGenerator = sequenceGenerator;
     }
 
     @PostMapping("/add")
     public ProductDTO create(@RequestBody ProductDTO dtoModel) {
         System.out.println("Product Service A");
-        if (!sequenceGenerator.checkIfExist(dtoModel.getId(),"product_sequence"))
+        if (!sequenceGenerator.checkIfExist(dtoModel.getId(), "product_sequence"))
             dtoModel.setId(sequenceGenerator.generateSequence("product_sequence"));
         return servicePort.addProduct(dtoModel);
     }
@@ -54,3 +53,4 @@ public class ProductController {
         return servicePort.getProductById(id);
     }
 }
+

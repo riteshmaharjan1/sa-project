@@ -1,0 +1,17 @@
+server:
+  port: 8095
+spring:
+  data:
+    mongodb:
+      database: WebStoreDB
+  zipkin:
+    base-url: http://localhost:9411/
+  sleuth:
+    sampler:
+      probability: 1
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8090/eureka/, http://localhost:8089/eureka/
+  instance:
+    instance-id: ${spring.application.name}:${random.value}
