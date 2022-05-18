@@ -5,6 +5,7 @@ import shoppingcartservice.pojo.ShoppingCart;
 
 public interface ShoppingCartServiceInterface {
 
+    ShoppingCart createShoppingCart(int customerId);
     void setShoppingCart(ShoppingCart shoppingCart);
     ShoppingCart getShoppingCart(int customerId);
     void deleteProduct(int customerId, Product product);

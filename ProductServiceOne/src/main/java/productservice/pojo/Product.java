@@ -1,42 +1,34 @@
-package shoppingcartservice.pojo;
+package productservice.pojo;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document
 public class Product {
-
+    @Id
     private int productNumber;
     private String productName;
-    private int quantity;
+    private int stockNumber;
 
     private double price;
     private String description;
 
-    private int customerId;
-
     public Product() {
     }
 
-    public Product(int productNumber, String productName, int stockNumber, double price, String description, int customerId) {
+    public Product(int productNumber, String productName, int stockNumber, double price, String description) {
         this.productNumber = productNumber;
         this.productName = productName;
-        this.quantity = stockNumber;
+        this.stockNumber = stockNumber;
         this.price = price;
         this.description = description;
-        this.customerId = customerId;
     }
 
-    public Product(String productName, int stockNumber, double price, String description, int customerId) {
+    public Product(String productName, int stockNumber, double price, String description) {
         this.productName = productName;
-        this.quantity = stockNumber;
+        this.stockNumber = stockNumber;
         this.price = price;
         this.description = description;
-        this.customerId = customerId;
-    }
-
-    public int getCustomerId() {
-        return customerId;
-    }
-
-    public void setCustomerId(int customerId) {
-        this.customerId = customerId;
     }
 
     public int getProductNumber() {
@@ -55,12 +47,12 @@ public class Product {
         this.productName = productName;
     }
 
-    public int getQuantity() {
-        return quantity;
+    public int getStockNumber() {
+        return stockNumber;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public void setStockNumber(int stockNumber) {
+        this.stockNumber = stockNumber;
     }
 
     public double getPrice() {
@@ -77,12 +69,5 @@ public class Product {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) return false;
-        if (!(obj instanceof Product product)) return false;
-        return product.getProductNumber() == this.getProductNumber();
     }
 }

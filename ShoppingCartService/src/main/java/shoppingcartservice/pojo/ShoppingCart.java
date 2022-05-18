@@ -10,7 +10,7 @@ import java.util.List;
 public class ShoppingCart {
     @Id
     private int shoppingCartNumber;
-    private final List<Product> products;
+    private List<Product> products;
 
     public ShoppingCart(List<Product> products) {
         this.products = products;
@@ -19,6 +19,9 @@ public class ShoppingCart {
     public ShoppingCart(Product product) {
         this.products = new ArrayList<>();
         products.add(product);
+    }
+
+    public ShoppingCart() {
     }
 
     public void addProduct(Product product){

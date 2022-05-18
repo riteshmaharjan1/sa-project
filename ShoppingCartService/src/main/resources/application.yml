@@ -1,0 +1,12 @@
+
+spring:
+  data:
+    mongodb:
+      auto-index-creation: true
+      host: localhost
+      port: 27017
+      database: shopping_cart_db
+  application:
+    name: Shopping Cart Service
+server:
+  port: 8092
