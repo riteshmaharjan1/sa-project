@@ -1,5 +1,5 @@
 spring:
   application:
-    name: ProductService
+    name: ProductLoadBalancer
   config:
     import: optional:configserver:http://localhost:8888/

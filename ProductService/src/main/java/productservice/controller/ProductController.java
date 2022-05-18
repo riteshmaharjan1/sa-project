@@ -1,67 +1,56 @@
 package productservice.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import productservice.pojo.Product;
+import productservice.infrastructure.utility.SequenceGeneratorService;
+import productservice.pojo.ProductDTO;
 import productservice.service.ProductService;
 
+import java.util.List;
+
 @RestController
+@RequestMapping("/product")
 public class ProductController {
     @Autowired
-    private ProductService productService;
+    private ProductService servicePort;
 
-    @GetMapping("/getProduct/{productNumber}")
-    public ResponseEntity<?> getProduct(@PathVariable int productNumber) {
-        Product product = productService.getProduct(productNumber);
-        if (product != null)
-            return new ResponseEntity<>(product, HttpStatus.OK);
-        else
-            return new ResponseEntity<>(new CustomMessage("Product not found.")
-                    , HttpStatus.NOT_FOUND);
+    private SequenceGeneratorService sequenceGenerator;
+
+    @Autowired
+    public ProductController(SequenceGeneratorService sequenceGenerator)
+    {
+        this.sequenceGenerator=sequenceGenerator;
     }
 
-    @PostMapping("/addProduct")
-    public ResponseEntity<?> addProduct(@RequestBody Product product) {
-        Product addPro = productService.insertProduct(product);
-        if (addPro != null) {
-            return new ResponseEntity<>("Success", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(new CustomMessage("Product already exists. Unable to add product.")
-                    , HttpStatus.NOT_FOUND);
-        }
+    @PostMapping("/add")
+    public ProductDTO create(@RequestBody ProductDTO dtoModel) {
+        System.out.println("Product Service A");
+        if (!sequenceGenerator.checkIfExist(dtoModel.getId(),"product_sequence"))
+            dtoModel.setId(sequenceGenerator.generateSequence("product_sequence"));
+        return servicePort.addProduct(dtoModel);
     }
 
-    @PutMapping("/editProduct")
-    public ResponseEntity<?> editProduct(@RequestBody Product product) {
-        Product updatedPro = productService.updateProduct(product);
-        if (updatedPro != null) {
-            return new ResponseEntity<>("Success", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(new CustomMessage("Product doesn't exists.")
-                    , HttpStatus.NOT_FOUND);
-        }
+    @PutMapping("/update")
+    public ProductDTO update(@RequestBody ProductDTO ProductDto) {
+        System.out.println("Product Service A");
+        return servicePort.addProduct(ProductDto);
     }
 
-    @DeleteMapping("/deleteProduct/{productNumber}")
-    public ResponseEntity<?> deleteProduct(@PathVariable Integer productNumber) {
-        if (productService.productExists(productNumber)) {
-            productService.deleteProduct(productNumber);
-            return new ResponseEntity<>("Successfully Deleted.", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(new CustomMessage("Product doesn't exists.")
-                    , HttpStatus.NOT_FOUND);
-        }
+    @DeleteMapping("/remove/{id}")
+    public void delete(@PathVariable long id) {
+        System.out.println("Product Service A");
+        servicePort.deleteProductById(id);
     }
 
-    @GetMapping("/getAllProducts")
-    public ResponseEntity<?> getAllProducts() {
-        if (productService.getAllProduct().size() == 0) {
-            return new ResponseEntity<>(new CustomMessage("Product not available.")
-                    , HttpStatus.NOT_FOUND);
-        } else {
-            return new ResponseEntity<>(productService.getAllProduct(), HttpStatus.OK);
-        }
+    @GetMapping("/list")
+    public List<ProductDTO> gets() {
+        System.out.println("Product Service A");
+        return servicePort.getProducts();
+    }
+
+    @GetMapping("/view/{id}")
+    public ProductDTO get(@PathVariable long id) {
+        System.out.println("Product Service A");
+        return servicePort.getProductById(id);
     }
 }
