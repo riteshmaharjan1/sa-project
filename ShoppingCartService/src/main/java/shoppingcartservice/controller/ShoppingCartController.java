@@ -1,56 +1,113 @@
 package shoppingcartservice.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestOperations;
+import org.springframework.web.client.RestTemplate;
+import shoppingcartservice.domain.data.ProductDto;
+import shoppingcartservice.domain.data.ShoppingCartDto;
+import shoppingcartservice.domain.ports.api.ShoppingCartServicePort;
+import shoppingcartservice.infrastructure.integration.ISender;
+import shoppingcartservice.infrastructure.utility.SequenceGeneratorService;
 import shoppingcartservice.pojo.Product;
 import shoppingcartservice.pojo.ShoppingCart;
 import shoppingcartservice.service.ShoppingCartService;
 
 @RestController
+@RequestMapping("/shoppingcart")
 public class ShoppingCartController {
+    @Autowired
+    private ShoppingCartService servicePort;
 
     @Autowired
-    private ShoppingCartService shoppingCartService;
+    @Lazy
+    private RestOperations restTemplate;
 
-    @GetMapping("/getShoppingCart/{customerId}")
-    public ResponseEntity<?> getShoppingCart(@PathVariable int customerId) {
-        ShoppingCart shoppingCart = shoppingCartService.getShoppingCart(customerId);
-        if (shoppingCart != null)
-            return new ResponseEntity<>(shoppingCart, HttpStatus.OK);
-        else
-            return new ResponseEntity<>(new CustomMessage("No Cart found!!")
-                    , HttpStatus.BAD_REQUEST);
+    @Autowired
+    ISender sender;
+
+    private SequenceGeneratorService sequenceGenerator;
+
+    @Autowired
+    public ShoppingCartController(SequenceGeneratorService sequenceGenerator)
+    {
+        this.sequenceGenerator=sequenceGenerator;
     }
 
-    @GetMapping("/createShoppingCart/{customerId}")
-    public ResponseEntity<?> createShoppingCart(@PathVariable int customerId) {
-        ShoppingCart shoppingCart = shoppingCartService.getShoppingCart(customerId);
-        if (shoppingCart != null)
-            return new ResponseEntity<>(new CustomMessage("Shopping Cart Already Exist for this user.")
-                    , HttpStatus.BAD_REQUEST);
-        ShoppingCart s = shoppingCartService.createShoppingCart(customerId);
-        return new ResponseEntity<>(s, HttpStatus.OK);
+    @PostMapping("/create")
+    public ShoppingCartDto create(@RequestBody ShoppingCartDto dtoModel) {
+        if (!sequenceGenerator.checkIfExist(dtoModel.getId(),"ShoppingCart_sequence"))
+            dtoModel.setId(sequenceGenerator.generateSequence("ShoppingCart_sequence"));
+        try {
+            ShoppingCartDto returnCart = servicePort.addShoppingCart(dtoModel);
+            sender.send("topicShoppingCart", sender.stringObject(returnCart));
+            return returnCart;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
-    @PostMapping("/addProduct")
-    public ResponseEntity<?> addProduct(@RequestBody Product product) {
-        shoppingCartService.addProduct(product.getCustomerId(), product);
-        return new ResponseEntity<>(product, HttpStatus.OK);
+    @PutMapping("/addproduct/{cart}")
+    public ShoppingCartDto addProduct(@PathVariable long cart, @RequestBody ProductDto productDto) {
+        try {
+            ShoppingCartDto returnCart = servicePort.addProduct(cart, productDto);
+            sender.send("topicShoppingCart", sender.stringObject(returnCart));
+            return returnCart;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
-    @DeleteMapping("/removeProduct")
-    public ResponseEntity<?> deleteProduct(@RequestBody Product product) {
-        shoppingCartService.deleteProduct(product.getCustomerId(), product);
-        return new ResponseEntity<>(new CustomMessage("Product Removed From Shopping Cart")
-                , HttpStatus.OK);
+    @DeleteMapping("/removeproduct/{cart}")
+    public ShoppingCartDto removeProduct(@PathVariable long cart, @RequestBody ProductDto productDto) {
+        try {
+            ShoppingCartDto returnCart = servicePort.removeProduct(cart, productDto);
+            sender.send("topicShoppingCart", sender.stringObject(returnCart));
+            return returnCart;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
-    @PutMapping("/updateQuantity")
-    public ResponseEntity<?> updateQuantity(@RequestBody Product product) {
-        shoppingCartService.updateQuantity(product, product.getQuantity(), product.getCustomerId());
-        return new ResponseEntity<>(new CustomMessage("Quantity Updated.")
-                , HttpStatus.OK);
+    @PutMapping("/changequantity/{cart}")
+    public ShoppingCartDto changeQuantity(@PathVariable long cart, @RequestBody ProductDto productDto) {
+        try {
+            ShoppingCartDto returnCart = servicePort.updateProduct(cart, productDto);
+            sender.send("topicShoppingCart", sender.stringObject(returnCart));
+            return returnCart;
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
+    @GetMapping("/view/{id}")
+    public ShoppingCartDto get(@PathVariable long id) throws JsonProcessingException {
+        try {
+            ShoppingCartDto returnCart = servicePort.getShoppingCartById(id);
+            sender.send("topicShoppingCart", sender.stringObject(returnCart));
+            return returnCart;
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
+    @PutMapping("/checkout/{cart}")
+    public String checkout(@PathVariable long cart, @RequestBody ShoppingCartDto cartDto) {
+        try {
+            restTemplate.postForLocation("http://localhost:8080/order/create", cartDto,ShoppingCartDto.class);
+            return "Success";
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
+    @Bean
+    RestOperations restTemplate() {
+        return new RestTemplate();
     }
 }

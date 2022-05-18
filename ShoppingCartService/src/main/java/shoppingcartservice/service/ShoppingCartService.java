@@ -2,83 +2,68 @@ package shoppingcartservice.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import shoppingcartservice.domain.data.ProductDto;
+import shoppingcartservice.domain.data.ShoppingCartDto;
+import shoppingcartservice.domain.ports.api.ShoppingCartServicePort;
+import shoppingcartservice.domain.ports.spi.ShoppingCartPersistencePort;
 import shoppingcartservice.pojo.Product;
 import shoppingcartservice.pojo.ShoppingCart;
 import shoppingcartservice.repository.ShoppingCartRepository;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ShoppingCartService implements ShoppingCartServiceInterface {
+public class ShoppingCartService implements ShoppingCartServicePort {
 
     @Autowired
-    private ShoppingCartRepository repository;
-
+    private ShoppingCartPersistencePort persistencePort;
 
     @Override
-    public ShoppingCart createShoppingCart(int customerId) {
-        ShoppingCart shoppingCart = new ShoppingCart(new ArrayList<>());
-        shoppingCart.setShoppingCartNumber(customerId);
-        setShoppingCart(shoppingCart);
-        return shoppingCart;
+    public ShoppingCartDto addShoppingCart(ShoppingCartDto dtoModel) {
+        ShoppingCartDto ShoppingCartDTO=persistencePort.addShoppingCart(dtoModel);
+        return ShoppingCartDTO;
     }
 
     @Override
-    public void setShoppingCart(ShoppingCart shoppingCart) {
-        repository.insert(shoppingCart);
+    public ShoppingCartDto addProduct(long cartId, ProductDto dtoModel){
+        ShoppingCartDto cartModel = persistencePort.getShoppingCartById(cartId);
+        cartModel.addProduct(dtoModel);
+        return persistencePort.updateShoppingCart(cartModel);
     }
 
     @Override
-    public ShoppingCart getShoppingCart(int customerId) {
-        Optional<ShoppingCart> shoppingCart = repository.findById(customerId);
-        return shoppingCart.orElse(null);
+    public ShoppingCartDto removeProduct(long cartId, ProductDto dtoModel){
+        ShoppingCartDto cartModel = persistencePort.getShoppingCartById(cartId);
+        cartModel.removeProduct(dtoModel);
+        return persistencePort.updateShoppingCart(cartModel);
     }
 
     @Override
-    public void deleteProduct(int customerId, Product product) {
-        Optional<ShoppingCart> shoppingCart = repository.findById(customerId);
-        shoppingCart.ifPresent(cart -> {
-            cart.getProducts().remove(product);
-
-            repository.deleteById(customerId);
-            repository.insert(shoppingCart.get());
-        });
+    public ShoppingCartDto updateProduct(long cartId, ProductDto dtoModel){
+        ShoppingCartDto cartModel = persistencePort.getShoppingCartById(cartId);
+        cartModel.updateProduct(dtoModel);
+        return persistencePort.updateShoppingCart(cartModel);
     }
 
     @Override
-    public void addProduct(int customerId, Product product) {
-        Optional<ShoppingCart> shoppingCart = repository.findById(customerId);
-        shoppingCart.ifPresent(cart -> {
-            if (cart.checkProduct(product)) {
-                cart.increaseProductQuantity(product);
-            } else {
-                cart.addProduct(product);
-            }
-
-            repository.deleteById(customerId);
-            repository.insert(shoppingCart.get());
-        });
+    public void deleteShoppingCartById(long id) {
+        persistencePort.deleteShoppingCartById(id);
     }
 
     @Override
-    public void updateQuantity(Product product, int quantity, int customerId) {
-        Optional<ShoppingCart> shoppingCart = repository.findById(customerId);
-        shoppingCart.ifPresent(cart -> {
-            int lastIndex = cart.getProducts().indexOf(product);
-            if (lastIndex == -1) {
-                cart.addProduct(product);
-            } else
-                cart.getProducts().get(lastIndex).setQuantity(quantity);
-
-            repository.deleteById(customerId);
-            repository.insert(cart);
-        });
+    public ShoppingCartDto updateShoppingCart(ShoppingCartDto dtoModel) {
+        return persistencePort.updateShoppingCart(dtoModel);
     }
 
     @Override
-    public int getProductCount(Integer customerId) {
-        Optional<ShoppingCart> shoppingCart = repository.findById(customerId);
-        return shoppingCart.map(ShoppingCart::getProductCount).orElse(0);
+    public List<ShoppingCartDto> getShoppingCarts() {
+        return persistencePort.getShoppingCarts();
+    }
+
+    @Override
+    public ShoppingCartDto getShoppingCartById(long id) {
+        return persistencePort.getShoppingCartById(id);
     }
 }
