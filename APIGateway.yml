@@ -11,8 +11,8 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: PRODUCT-SERVICE-LB
-          uri: lb://PRODUCT-SERVICE-LB
+        - id: ProductLoadBalancer
+          uri: lb://ProductLoadBalancer
           predicates:
             - Path=/product/**
         - id: CustomerService
@@ -27,18 +27,18 @@ spring:
           uri: lb://OrderService
           predicates:
             - Path=/order/**
-        - id: CART-SERVICE
-          uri: lb://CART-SERVICE
+        - id: ShoppingCartService
+          uri: lb://ShoppingCartService
           predicates:
             - Path=/shoppingcart/**
-        - id: CART-SERVICE-VIEWER
-          uri: lb://CART-SERVICE-VIEWER
+        - id: CartServiceViewer
+          uri: lb://CartServiceViewer
           predicates:
             - Path=/shoppingcartviewer/**
           filters:
             - name: CircuitBreaker
               args:
-                name: PRODUCT-SERVICE-LB
+                name: ProductLoadBalancer
                 fallbackUri: forward:/product-fallback
             - name: Retry
               args:
