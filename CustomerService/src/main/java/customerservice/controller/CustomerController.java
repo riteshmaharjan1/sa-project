@@ -1,75 +1,50 @@
 package customerservice.controller;
 
-import customerservice.pojo.Customer;
-import customerservice.service.CustomerService;
-import customerservice.integration.Sender;
+import customerservice.domain.dto.CustomerDto;
+import customerservice.repository.dbsequence.SequenceGeneratorService;
+import customerservice.service.serviceinterface.CustomerServicePort;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
+@RequestMapping("/customer")
 public class CustomerController {
     @Autowired
-    CustomerService customerService;
+    private CustomerServicePort servicePort;
+
+    private SequenceGeneratorService sequenceGenerator;
 
     @Autowired
-    Sender sender;
-
-    @GetMapping("/customers/{customerNumber}")
-    public ResponseEntity<?> getCustomer(@PathVariable("customerNumber") Integer customerNumber) {
-        Customer customer = customerService.getCustomer(customerNumber);
-        if (customer != null) {
-            return new ResponseEntity<>(customer, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(new CustomMessage("Customer not found.")
-                    , HttpStatus.NOT_FOUND);
-        }
+    public CustomerController(SequenceGeneratorService sequenceGenerator) {
+        this.sequenceGenerator = sequenceGenerator;
     }
 
-    @PostMapping("/customers")
-    public ResponseEntity<?> addCustomer(@RequestBody Customer customer) {
-        Customer addCus = customerService.insertCustomer(customer);
-        if (addCus != null) {
-            sender.sendData("CUSTOMER_ADDED", customer);
-            return new ResponseEntity<>("Success", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(new CustomMessage("Customer already exists. Unable to add customer.")
-                    , HttpStatus.BAD_REQUEST);
-        }
+    @PostMapping("/add")
+    public CustomerDto create(@RequestBody CustomerDto dtoModel) {
+        if (!sequenceGenerator.checkIfExist(dtoModel.getId(), "customer_sequence"))
+            dtoModel.setId(sequenceGenerator.generateSequence("customer_sequence"));
+        return servicePort.addCustomer(dtoModel);
     }
 
-    @PutMapping("/customers")
-    public ResponseEntity<?> editCustomer(@RequestBody Customer customer) {
-        Customer udpate = customerService.updateCustomer(customer);
-        if (udpate != null) {
-            sender.sendData("CUSTOMER_UPDATED", customer);
-            return new ResponseEntity<>("Successfully updated.", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(new CustomMessage("Customer doesn't exists.")
-                    , HttpStatus.NOT_FOUND);
-        }
+    @PutMapping("/update")
+    public CustomerDto update(@RequestBody CustomerDto CustomerDto) {
+        return servicePort.addCustomer(CustomerDto);
     }
 
-    @DeleteMapping("/customers/{customerId}")
-    public ResponseEntity<?> deleteCustomer(@PathVariable Integer customerId) {
-        if (customerService.customerExists(customerId)) {
-            customerService.deleteCustomer(customerId);
-            sender.sendData("CUSTOMER_DELETED", customerId);
-            return new ResponseEntity<>("Successfully Deleted.", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(new CustomMessage("Customer doesn't exists.")
-                    , HttpStatus.NOT_FOUND);
-        }
+    @DeleteMapping("/remove/{id}")
+    public void delete(@PathVariable long id) {
+        servicePort.deleteCustomerById(id);
     }
 
-    @GetMapping("/getAllCustomers")
-    public ResponseEntity<?> getAllCustomers() {
-        if (customerService.getAllCustomer().size() == 0) {
-            return new ResponseEntity<>(new CustomMessage("Customers not available.")
-                    , HttpStatus.NOT_FOUND);
-        } else {
-            return new ResponseEntity<>(customerService.getAllCustomer(), HttpStatus.OK);
-        }
+    @GetMapping("/list")
+    public List<CustomerDto> gets() {
+        return servicePort.getCustomers();
+    }
+
+    @GetMapping("/view/{id}")
+    public CustomerDto get(@PathVariable long id) {
+        return servicePort.getCustomerById(id);
     }
 }
