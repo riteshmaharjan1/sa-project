@@ -26,8 +26,4 @@ public class KafkaConfig {
         return new NewTopic(TopicTermino.DELETED.getValue(), 1, (short) 1);
     }
 
-    @Bean
-    public NewTopic tooFast() {
-        return new NewTopic("tooFastTopic", 1, (short) 1);
-    }
 }
