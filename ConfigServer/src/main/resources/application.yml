@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: Config Service
+server:
+  port: 8888
