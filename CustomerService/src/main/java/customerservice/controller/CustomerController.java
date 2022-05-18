@@ -2,6 +2,7 @@ package customerservice.controller;
 
 import customerservice.pojo.Customer;
 import customerservice.service.CustomerService;
+import customerservice.service.Sender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +13,10 @@ public class CustomerController {
     @Autowired
     CustomerService customerService;
 
-    @GetMapping("/getCustomer/{customerNumber}")
+    @Autowired
+    Sender sender;
+
+    @GetMapping("/customers/{customerNumber}")
     public ResponseEntity<?> getCustomer(@PathVariable("customerNumber") Integer customerNumber) {
         Customer customer = customerService.getCustomer(customerNumber);
         if (customer != null) {
@@ -23,10 +27,11 @@ public class CustomerController {
         }
     }
 
-    @PostMapping("/addCustomer")
+    @PostMapping("/customers")
     public ResponseEntity<?> addCustomer(@RequestBody Customer customer) {
         Customer addCus = customerService.insertCustomer(customer);
         if (addCus != null) {
+            sender.sendCustomer("CUSTOMER_ADDED", customer);
             return new ResponseEntity<>("Success", HttpStatus.OK);
         } else {
             return new ResponseEntity<>(new CustomMessage("Customer already exists. Unable to add customer.")
@@ -34,10 +39,11 @@ public class CustomerController {
         }
     }
 
-    @PutMapping("/editCustomer")
+    @PutMapping("/customers")
     public ResponseEntity<?> editCustomer(@RequestBody Customer customer) {
         Customer udpate = customerService.updateCustomer(customer);
         if (udpate != null) {
+            sender.sendCustomer("CUSTOMER_UPDATED", customer);
             return new ResponseEntity<>("Successfully updated.", HttpStatus.OK);
         } else {
             return new ResponseEntity<>(new CustomMessage("Customer doesn't exists.")
@@ -45,10 +51,11 @@ public class CustomerController {
         }
     }
 
-    @DeleteMapping("/deleteCustomer/{customerId}")
+    @DeleteMapping("/customers/{customerId}")
     public ResponseEntity<?> deleteCustomer(@PathVariable Integer customerId) {
         if (customerService.customerExists(customerId)) {
             customerService.deleteCustomer(customerId);
+            sender.sendDeleteID("CUSTOMER_DELETED", customerId);
             return new ResponseEntity<>("Successfully Deleted.", HttpStatus.OK);
         } else {
             return new ResponseEntity<>(new CustomMessage("Customer doesn't exists.")
