@@ -1,12 +1,16 @@
+#Program server port
 server:
   port: 8092
 
+#Eureka server details
 eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/
 #      defaultZone: http://172.19.141.42:8761/eureka/
+
 spring:
+  #  Mongo DB configurations
   data:
     mongodb:
       auto-index-creation: true
@@ -14,6 +18,13 @@ spring:
       port: 27017
       database: CustomerDB
 
-
+  #application details
   application:
     name: CustomerService
+
+  #Kafka Properties
+  kafka:
+    consumer:
+      group-id: group-1
+      auto-offset-reset: earliest
+      bootstrap-servers: localhost:9092
