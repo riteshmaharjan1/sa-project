@@ -9,7 +9,7 @@ import productservice.pojo.Product;
 import productservice.service.ProductService;
 
 @RestController
-@Profile("ProductMain")
+@Profile("ProductOne")
 public class ProductController {
     @Autowired
     private ProductService productService;
@@ -70,6 +70,6 @@ public class ProductController {
     //For testing purpose
     @GetMapping("/products/test")
     public int getStock() {
-        return 100;
+        return 500;
     }
 }
