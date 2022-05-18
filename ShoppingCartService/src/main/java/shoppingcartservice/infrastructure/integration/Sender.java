@@ -14,7 +14,7 @@ public class Sender implements ISender {
     private KafkaTemplate<String, String> kafkaTemplate;
 
     @Override
-    public String stringObject(ShoppingCartDto shoppingDto) throws JsonProcessingException {
+    public String stringJSON(ShoppingCartDto shoppingDto) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(shoppingDto);
     }
