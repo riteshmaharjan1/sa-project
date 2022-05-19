@@ -51,7 +51,7 @@ public class ProductLoadBalanceController {
 
 
     private String getEurkaClient2BaseUri(){
-        ServiceInstance serviceInstance =  loadBalancerClient.choose("PRODUCT-SERVICE");
+        ServiceInstance serviceInstance =  loadBalancerClient.choose("ProductService");
         return serviceInstance.getUri().toString();
     }
 }
