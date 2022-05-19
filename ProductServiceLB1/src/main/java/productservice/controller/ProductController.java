@@ -10,7 +10,7 @@ import productservice.service.ProductService;
 import java.util.List;
 
 @RestController
-@Profile("ProductMain")
+@Profile("ProductServiceLB1")
 @RequestMapping("/product")
 public class ProductController {
     @Autowired
