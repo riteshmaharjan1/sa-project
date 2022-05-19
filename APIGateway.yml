@@ -57,7 +57,7 @@ spring:
   resilience4j:
     circuitbreaker:
       instances:
-        PRODUCT-SERVICE:
+        ProductService:
           slidingWindowSize: 10
           permittedNumberOfCallsInHalfOpenState: 5
           failureRateThreshold: 50
@@ -65,5 +65,5 @@ spring:
           registerHealthIndicator: true
     timelimiter:
       instances:
-        PRODUCT-SERVICE:
+        ProductService:
           timeoutDuration: 2s
