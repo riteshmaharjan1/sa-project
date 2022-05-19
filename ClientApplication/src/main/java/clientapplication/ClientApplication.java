@@ -30,25 +30,25 @@ public class ClientApplication implements CommandLineRunner {
         System.out.println("\nAdding Product");
         System.out.println("***********************************************************************");
         restTemplate.postForLocation("http://localhost:8080/product/add",
-                new ProductDto(1, "D-001", "Dell", 1000, true, 5.5, "Laptop", 10, null));
+                new ProductDto(1, "D-001", "APPLE Macbook", 1000, true, 5.5, "Laptop", 10, null));
         System.out.println("Added Product 1::" + restTemplate.getForObject("http://localhost:8080/product/view/1", ProductDto.class));
         System.out.println("\n");
         System.out.println("***********************************************************************");
 
         restTemplate.postForLocation("http://localhost:8080/product/add",
-                new ProductDto(2, "D-002", "Headset", 10, true, 10, "Headset", 10, null));
+                new ProductDto(2, "D-002", "Noise Cancellation BUDs", 140, true, 10, "BUDs", 10, null));
         System.out.println("Added Product 2::" + restTemplate.getForObject("http://localhost:8080/product/view/2", ProductDto.class));
 
         System.out.println("\n");
         System.out.println("\nModify Product");
         System.out.println("***********************************************************************");
         restTemplate.put("http://localhost:8080/product/update",
-                new ProductDto(1, "D-001", "Dell-Modified", 1000 * 0.01, true, 5.5, "Laptop with latest gen", 10, null));
+                new ProductDto(1, "D-001", "MACbook PRO II-MODIFIED", 1000 * 0.01, true, 5.5, "Laptop with latest gen", 10, null));
         System.out.println("Product 1 Updated::" + restTemplate.getForObject("http://localhost:8080/product/view/1", ProductDto.class));
 
         System.out.println("***********************************************************************");
         restTemplate.put("http://localhost:8080/product/update",
-                new ProductDto(2, "D-002", "Headset-Updated", 10 * 0.01, true, 10, "Headset - black in color", 10, null));
+                new ProductDto(2, "D-002", "BUDS with wire-Updated", 10 * 0.01, true, 10, "BUDs - black in color", 10, null));
 
         System.out.println("Product 2 Updated::" + restTemplate.getForObject("http://localhost:8080/product/view/2", ProductDto.class));
 
@@ -82,11 +82,11 @@ public class ClientApplication implements CommandLineRunner {
                     {
                         add(new ProductDto(1
                                 , "D-001"
-                                , "Dell-Modified"
+                                , " JACK-Modified"
                                 , 1000 * 0.01
                                 , true
                                 , 5.5
-                                , "Laptop with latest gen"
+                                , "For those with jac soch."
                                 , 10
                                 , null));
                     }
@@ -96,11 +96,11 @@ public class ClientApplication implements CommandLineRunner {
         restTemplate.put("http://localhost:8080/shoppingcart/addproduct/1",
                 new ProductDto(2
                         , "D-002"
-                        , "Headset-Updated"
+                        , "Postmap-Updated"
                         , 10 * 0.01
                         , true
                         , 10
-                        , "Headset - black in color"
+                        , "Man - black in color"
                         , 10
                         , null));
 
@@ -126,11 +126,11 @@ public class ClientApplication implements CommandLineRunner {
         restTemplate.put("http://localhost:8080/shoppingcart/addproduct/1",
                 new ProductDto(2
                         , "D-002"
-                        , "Headset-Updated"
+                        , "BUDs-Updated"
                         , 10 * 0.01
                         , true
                         , 10
-                        , "Headset - black in color"
+                        , "BUDs - black in color"
                         , 10
                         , null));
         System.out.println("Showing the updated shopping cart::" + restTemplate.getForObject("http://localhost:8080/shoppingcart/view/1", ShoppingCartDto.class));
@@ -140,11 +140,11 @@ public class ClientApplication implements CommandLineRunner {
         restTemplate.put("http://localhost:8080/shoppingcart/addproduct/1",
                 new ProductDto(2
                         , "D-002"
-                        , "Headset-Updated"
+                        , "BUDs-Updated"
                         , 10 * 0.01
                         , true
                         , 10
-                        , "Headset - black in color"
+                        , "BUDs - black in color"
                         , 10
                         , null));
 
